@@ -1,25 +1,32 @@
-import random
+import colorama
+from colorama import Fore
 
-def ai_move(board):
-    move = get_best_move(board)
-    board[move[0]][move[1]] = 'o'
+colorama.init(autoreset=True)
 
-def player_move(board):
+def draw_board(board):
+    print("\n")
+    for i in range(3):
+        for j in range(3):
+            if board[i][j] == ' ':
+                print(Fore.LIGHTBLACK_EX + f" {i * 3 + j + 1} ", end="")
+            else:
+                print(f" {board[i][j]} ", end="")
+            if j < 2:
+                print("|", end="")
+        if i < 2:
+            print("-----------")
+    print("\n")
+    
+def get_player_move(board):
     while True:
-        row = int(input('Enter row (1-3): ')) - 1
-        col = int(input('Enter column (1-3): ')) - 1
+        x = int(input('Enter cell number (1-9): '))
+        row, col = divmod(x - 1, 3)
         if board[row][col] == ' ':
             board[row][col] = 'x'
             break
         else:
-            print('Cell already occupied. Try again.')
+           print('Cell already occupied. Try again.')
 
-def draw_board(board):
-    for x, row in enumerate(board):
-        print(' | '.join(row))
-        if x != 2: print('___' * 3 )
-    print()
-    
 def get_best_move(board):
     best_score = -10
     move = (-1, -1)
@@ -33,7 +40,7 @@ def get_best_move(board):
                     best_score = score
                     move = (i, j)
     board[move[0]][move[1]] = 'o'
-    return move    
+    return move 
 
 def check_win(board, player):
     for i in range(3):
@@ -46,7 +53,7 @@ def check_win(board, player):
         return True
     if board[0][2] == board[1][1] == board[2][0] == player:
         return True
-    
+
 def minimax(board, depth, maximizing_player):
     if check_win(board, 'x'):
         return -1
@@ -76,8 +83,7 @@ def minimax(board, depth, maximizing_player):
                     min_eval = min(min_eval, eval)
         return min_eval
     
-    
-def is_ai_trun(player):
+def is_ai_turn(player):
     return player == 1
 
 def is_full(board):
@@ -86,13 +92,13 @@ def is_full(board):
             return False
     return True
 
+
 def main():
-    player = random.randint(0, 1)
     board = [[' ' for _ in range(3)] for _ in range(3)]
     
     while True:
         draw_board(board)
-        player_move(board)
+        get_player_move(board)
         if check_win(board, 'x'):
             draw_board(board)
             print('Player wins!')
@@ -101,7 +107,10 @@ def main():
             draw_board(board)
             print('It\'s a draw!')
             break
-        ai_move(board)
+            
+        move = get_best_move(board)
+        board[move[0]][move[1]] = 'o'
+        
         if check_win(board, 'o'):
             draw_board(board)
             print('AI wins!')
